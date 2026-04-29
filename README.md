@@ -1,11 +1,11 @@
-# MultiDentNetV2
+# MultiDentNetV3
 
 **A unified deep learning framework for multi-class dental condition screening and preliminary risk stratification of cancer-suspicious oral lesions**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python](https://img.shields.io/badge/Python-3.8+-blue.svg)](https://python.org)
-[![PyTorch](https://img.shields.io/badge/PyTorch-1.12+-red.svg)](https://pytorch.org)
-[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Aliyar4061/MultiDentNet/blob/main/colab_setup.ipynb)
+[![PyTorch](https://img.shields.io/badge/PyTorch-2.0+-red.svg)](https://pytorch.org)
+[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Aliyar4061/MultiDentNetV3/blob/main/colab_setup.ipynb)
 
 ---
 
@@ -53,6 +53,32 @@
 
 ---
 
+## 🛠 Implementation Details
+
+All experiments are implemented in **PyTorch 2.0+** with the `timm` library for pretrained backbones. Training employs batch size 128 (adjusted for GPU memory constraints), seed 42 for reproducibility, and deterministic algorithms where supported. Data loading utilizes pinned memory and two worker processes for efficient I/O. The complete source code, trained weights, and evaluation scripts are publicly available at [https://github.com/Aliyar4061/MultiDentNetV3/tree/main](https://github.com/Aliyar4061/MultiDentNetV3/tree/main) to ensure full reproducibility and community adoption.
+
+### Training Hyperparameters & Software Stack
+
+| Component | Specification |
+|-----------|---------------|
+| **Framework** | PyTorch 2.0+, torchvision 0.15+ |
+| **Backbones** | DenseNet-121, EfficientNetV2-S, ResNet-50, Inception-V3 (via `timm`) |
+| **Input Size** | 224×224 pixels |
+| **Batch Size** | 128 (reduced to 64 or 32 for smaller GPUs) |
+| **Optimizer** | AdamW (lr = 5e-4, weight decay = 1e-4) |
+| **Scheduler** | CosineAnnealingLR (T_max = epochs) |
+| **Loss Function** | Focal Loss (γ = 2.0) + Label Smoothing (ε = 0.1) |
+| **Training Epochs** | 12 (early stopping patience = 3) |
+| **Data Augmentation** | Horizontal/Vertical flip, rotation (±20°), color jitter, CoarseDropout, CLAHE, elastic transform |
+| **Test Time Augmentation** | 5 steps (flips, rotation) |
+| **Ensemble Weighting** | Validation-accuracy-based exponential weighting (temperature τ = 10) |
+| **Bootstrapping** | 1000 iterations, 95% confidence intervals |
+| **Hardware** | NVIDIA RTX 3060 (12GB) / RTX 3090 / A100 |
+| **CUDA Version** | 11.7 or 11.8 |
+| **Reproducibility** | Random seed 42, deterministic CuDNN, `torch.use_deterministic_algorithms(True)` |
+
+---
+
 ## 💻 Environment & Hardware
 
 ### System Requirements
@@ -64,16 +90,15 @@
 
 ### Software Dependencies
 All required packages are listed in `requirements.txt`. Core libraries:
-- `torch>=1.12.0`, `torchvision>=0.13.0`
-- `timm>=0.6.0` (ImageNet pretrained backbones)
-- `albumentations>=1.1.0` (augmentations)
+- `torch>=2.0.0`, `torchvision>=0.15.0`
+- `timm>=0.9.0` (ImageNet pretrained backbones)
+- `albumentations>=1.3.0` (augmentations)
 - `scikit-learn`, `pandas`, `numpy`
 - `matplotlib`, `seaborn`, `tqdm`
 - `opencv-python-headless`, `pillow`
 - `thop` (optional, for FLOPs calculation)
 
 ---
-
 ## 🔧 Installation
 
 Clone the repository and install dependencies:
